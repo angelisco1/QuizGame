@@ -1,4 +1,5 @@
 var read = require('read');
+var fs = require('fs');
 
 
 var Question = function(qText, qAnswer, qId, qPoint){
@@ -31,14 +32,9 @@ var Quiz = function(){
 
 	this.startGame = function(){
 		this.selectBonusQuestion();
+		// var data = loadData();
+		// console.log(data);
 		this.getUser();
-		// if(this.currentUser !== null){
-		// 	console.log(this.currentUser);
-		// 	this.game();
-		// }else{
-		// 	console.log("FINITO");			
-		// }
-
 	}
 
 	this.getUser = function(){
@@ -162,6 +158,28 @@ var Quiz = function(){
 		this.questionList[randomId].qBonus = true;
 	}
 
+	function loadData(){
+		fs.readFile("./players.json", 'utf8', fileactions);
+		    function fileactions(err, file){ 
+		    if (err) {
+		        throw err;
+		    }
+			data = JSON.parse(file);
+
+		    //callback(searchFor(sortEpisodes(episodes)));
+		}
+		// this.getUser();
+	}
+
+	this.saveData = function(){
+		var data = JSON.stringify(this.userList);
+		fs.writeFile("./players.json", data, function(err){
+			if(err){
+				throw err;
+			}
+			console.log("It's saved.");
+		});
+	}
 
 	this.play = function(err, userAnswer){
 		if(err){
@@ -169,7 +187,10 @@ var Quiz = function(){
 		}
 		console.log(this.questionList[this.i].qAnswer);
 		var question = this.questionList[this.i];
-		if(this.checkAnswer(userAnswer, question)){
+		if(userAnswer.toLowerCase() === "save"){
+			//console.log(data);
+			this.saveData();
+		}else if(this.checkAnswer(userAnswer, question)){
 			this.i++;
 			var points = question.qPoint;
 			var strCorrect = "Your answer is correct...";
@@ -207,6 +228,6 @@ quiz.addQuestion("What is the capital of Australia??", "canberra", 5);
 quiz.addQuestion("How many months have 31 days??", "7", 3);
 quiz.addQuestion("Who invented the telephone??", "bell", 5);
 
-quiz.addUser("Angel");
+// quiz.addUser("Angel");
 
 quiz.startGame();
